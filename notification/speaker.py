@@ -12,9 +12,11 @@
 # OUTBOUND: 
 
 from sdk.python.module.notification import Notification
+from sdk.python.module.helpers.message import Message
 
 import sdk.python.utils.command
 import sdk.python.utils.exceptions as exception
+import pyttsx3
 
 class Speaker(Notification):
     # What to do when initializing
@@ -36,7 +38,7 @@ class Speaker(Notification):
             self.log_debug(sdk.python.utils.command.run("setup/start_bluetooth.sh"))
         # start the pulseaudio daemon
         self.log_info("Starting audio daemon...")
-        self.log_debug(sdk.python.utils.command.run("setup/start_pulseaudio.sh"))
+        #self.log_debug(sdk.python.utils.command.run("setup/start_pulseaudio.sh"))
         # if it is a bluetooth speaker, connect to it
         if self.config["bluetooth_speaker"]:
             self.log_info("Connecting to bluetooth speaker "+self.config["bluetooth_speaker_mac_address"]+"...")
@@ -58,6 +60,9 @@ class Speaker(Notification):
    # What to do when ask to notify
     def on_notify(self, severity, text):
         # TODO: queue if already playing something
+        print (self)
+        print (severity)
+        print (text)
         self.log_debug("Saying: "+text)
         output_file = "/tmp/audio_output.wav"
         # use the picotts engine
@@ -73,6 +78,30 @@ class Speaker(Notification):
             self.log_debug(sdk.python.utils.command.run(["mpg123", "-w", output_file, output_file+".mp3"], shell=False))
             # play it
             self.play(output_file)
+        elif self.config["engine"] == "pyttsx":
+            engine = pyttsx3.init()
+            engine.say(text)
+            engine.runAndWait()
+            del(engine)
+            print (text)
+            if  "How can I help you" in text or "What can I do for you?" in text:
+                message = Message(self)
+                message.recipient = "interaction/microphone"
+                message.command = "ACK_WAKE_UP"
+                message.set("request", "ack")
+                self.send(message)
+            else :
+                engine = pyttsx3.init()
+                engine.say("Could I do something else for you?")
+                engine.runAndWait()
+                del(engine)
+                # ask the microfone to continue listening
+                message = Message(self)
+                message.recipient = "interaction/microphone"
+                message.command = "ACK_LISTEN"
+                message.set("request", "ack")
+                self.send(message)
+
 
      # What to do when receiving a new/updated configuration for this module    
     def on_configuration(self, message):

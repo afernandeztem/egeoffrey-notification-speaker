@@ -11,7 +11,7 @@ modules:
     description: Play a notification out loud through an attached speaker
     module_configuration:
     - description: The text-to-speach engine to use
-      format: google|picotts
+      format: google|picotts|pyttsx
       name: engine
       placeholder: user@email.com
       required: true

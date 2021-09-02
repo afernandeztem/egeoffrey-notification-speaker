@@ -1,0 +1,10 @@
+export EGEOFFREY_GATEWAY_HOSTNAME=egeoffrey-gateway
+export EGEOFFREY_GATEWAY_PORT=443
+export EGEOFFREY_ID=house
+export EGEOFFREY_GATEWAY_TRANSPORT=websockets
+export EGEOFFREY_GATEWAY_SSL=0
+export EGEOFFREY_MODULES=notification/speaker
+export PYTHONPATH=.
+export EGEOFFREY_DEBUG=1
+export EGEOFFREY_VERBOSE=1
+
